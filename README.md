@@ -9,11 +9,11 @@
 </p>
 
 <p align="center">
-  <a href="#-quick-start">Quick Start</a> •
-  <a href="#-the-journey">The Journey</a> •
-  <a href="#-architecture">Architecture</a> •
-  <a href="#-prerequisites">Prerequisites</a> •
-  <a href="#-resources">Resources</a>
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#the-journey">The Journey</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#prerequisites">Prerequisites</a> •
+  <a href="#resources">Resources</a>
 </p>
 
 <p align="center">
