@@ -2,7 +2,7 @@
   <img src="00-image-generation/assets/00_command_center_1024.png" alt="Promptling Command Center" width="400"/>
 </p>
 
-<h1 align="center">Microsoft Foundry: Zero to Hero</h1>
+<h1 align="center">Microsoft Foundry for AI Engineers: Zero to Hero</h1>
 
 <p align="center">
   <strong>Build, Scale, and Govern AI Applications in the Enterprise</strong>
@@ -506,8 +506,8 @@ Before you begin, ensure you have:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/aymenfurter/microsoft-foundry-zero-to-hero.git
-cd microsoft-foundry-zero-to-hero
+git clone https://github.com/aymenfurter/AI-Engineer-Zero-to-Hero.git
+cd AI-Engineer-Zero-to-Hero
 
 # 2. Authenticate with Azure
 az login
@@ -550,7 +550,7 @@ The following table shows how each lab's features integrate with the centralized
 ## Repository Structure
 
 ```
-microsoft-foundry-zero-to-hero/
+AI-Engineer-Zero-to-Hero/
 ├── 📖 README.md                    # You are here!
 ├── 🎨 00-image-generation/         # Promptling mascot images
 ├── 🏗️ 01-project-setup/            # Phase 1: Foundations
@@ -612,7 +612,7 @@ microsoft-foundry-zero-to-hero/
 - **Speech Capabilities Lab** — Explore Foundry's voice features including the Voice Live API
 - **Basic vs Standard Agent Deployment** — Configure secure access to resources used within Agents (VNet integration, private endpoints)
 
-*Have ideas for new labs? [Open an issue](https://github.com/aymenfurter/microsoft-foundry-zero-to-hero/issues) or submit a PR!*
+*Have ideas for new labs? [Open an issue](https://github.com/aymenfurter/AI-Engineer-Zero-to-Hero/issues) or submit a PR!*
 
 ---
 
