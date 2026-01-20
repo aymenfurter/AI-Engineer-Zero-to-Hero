@@ -1,0 +1,12 @@
+.env
+hosted-agent-project
+.foundry
+*.pyc
+apollo14.html
+ntrs_data
+mcp_server.py
+mcp_test
+09-content-understanding/pdfs/
+team-deployments.json
+16-evaluation/*.json
+.foundry

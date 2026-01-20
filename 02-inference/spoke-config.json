@@ -1,0 +1,70 @@
+{
+  "$schema": "./spoke-config.schema.json",
+  "description": "Enterprise AI Foundry Spoke Configuration - Defines team projects and their model access via the central Landing Zone APIM gateway",
+  "landingZone": {
+    "resourceGroup": "foundry-lz-parent",
+    "apimUrl": "${APIM_URL}",
+    "apimKey": "${APIM_KEY}",
+    "availableModels": [
+      "gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano",
+      "gpt-4o", "gpt-4o-mini",
+      "grok-3", "DeepSeek-R1", "model-router"
+    ]
+  },
+  "spokes": [
+    {
+      "name": "contoso-team",
+      "displayName": "Contoso Ltd",
+      "description": "Supply chain AI team - inventory and logistics optimization",
+      "resourceGroup": "foundry-contoso",
+      "location": "eastus2",
+      "projects": [
+        {
+          "name": "inventory-ai",
+          "displayName": "Inventory AI",
+          "description": "AI-powered inventory management",
+          "allowedModels": ["gpt-4.1-mini", "gpt-4.1", "model-router"]
+        }
+      ]
+    },
+    {
+      "name": "fabrikam-team",
+      "displayName": "Fabrikam Inc",
+      "description": "Creative AI team - document generation and analysis",
+      "resourceGroup": "foundry-fabrikam",
+      "location": "eastus2",
+      "projects": [
+        {
+          "name": "doc-studio",
+          "displayName": "Document Studio",
+          "description": "Document generation and analysis",
+          "allowedModels": ["gpt-4o", "gpt-4o-mini", "grok-3"]
+        }
+      ]
+    },
+    {
+      "name": "woodgrove-team",
+      "displayName": "Woodgrove Bank",
+      "description": "Enterprise AI team - analytics and reasoning",
+      "resourceGroup": "foundry-woodgrove",
+      "location": "eastus2",
+      "projects": [
+        {
+          "name": "risk-analysis",
+          "displayName": "Risk Analysis",
+          "description": "Financial risk assessment AI",
+          "allowedModels": ["grok-3", "DeepSeek-R1", "gpt-4.1-mini"]
+        }
+      ]
+    }
+  ],
+  "directApimTeams": [
+    {
+      "name": "tailwind-legacy",
+      "displayName": "Tailwind Traders Legacy",
+      "description": "Legacy team connecting directly to APIM",
+      "apimSubscriptionName": "tailwind-access",
+      "allowedModels": ["gpt-4.1-mini", "gpt-4o-mini"]
+    }
+  ]
+}

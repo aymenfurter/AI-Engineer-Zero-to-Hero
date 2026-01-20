@@ -1,0 +1,8 @@
+{
+	"name": "Microsoft Foundry: Zero to Hero",
+	"image": "mcr.microsoft.com/devcontainers/python:2-3.14-trixie",
+	"features": {
+		"ghcr.io/devcontainers/features/azure-cli:1": {},
+		"ghcr.io/azure/azure-dev/azd:0": {}
+	}
+}

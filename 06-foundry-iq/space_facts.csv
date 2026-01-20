@@ -1,0 +1,16 @@
+id,fact,category,fun_rating
+fact-001,"A day on Venus is longer than its year! Venus takes 243 Earth days to rotate once but only 225 Earth days to orbit the Sun.",planets,5
+fact-002,"Jupiter's Great Red Spot is a storm that has been raging for over 400 years and is so big that Earth could fit inside it.",planets,5
+fact-003,"Saturn's rings are made mostly of ice particles ranging from tiny grains to chunks as big as houses.",planets,4
+fact-004,"Neutron stars are so dense that a teaspoon of their material would weigh about 6 billion tons on Earth.",stars,5
+fact-005,"The Sun contains 99.86% of all mass in our solar system.",stars,4
+fact-006,"If you could drive a car at 60 mph straight up it would take about an hour to reach space.",space-travel,3
+fact-007,"Footprints on the Moon will last for millions of years because there is no wind or water to erode them.",moon,4
+fact-008,"There are more stars in the universe than grains of sand on all of Earth's beaches.",universe,5
+fact-009,"A year on Mercury is just 88 Earth days but a day on Mercury lasts 59 Earth days.",planets,4
+fact-010,"Mars has the largest volcano in the solar system called Olympus Mons which is about 13.6 miles high.",planets,5
+fact-011,"The coldest place in the known universe is the Boomerang Nebula at -458°F just one degree above absolute zero.",universe,4
+fact-012,"Astronauts grow up to 2 inches taller in space because there is no gravity compressing their spines.",space-travel,4
+fact-013,"One million Earths could fit inside the Sun.",stars,5
+fact-014,"The International Space Station travels at about 17500 mph completing one orbit around Earth every 90 minutes.",space-travel,4
+fact-015,"Neptune's winds are the fastest in the solar system reaching speeds of 1200 mph.",planets,4
