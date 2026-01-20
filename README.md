@@ -515,20 +515,15 @@ The following table shows how each lab's features integrate with the centralized
 | **01c - Model Router** | model-router deployment | APIM | Intelligent routing across models |
 | **02a - Team Spokes** | Multi-team model access | Connection | Teams access models via `<connection>/<model>` |
 | **02b - Direct APIM** | REST API access | APIM | Direct APIM calls without Foundry SDK |
-| **03 - Governance** | Azure Policy | APIM | Deny policies prevent unauthorized deployments |
-| **04 - Hosted Agents** | Containerized agents | Local | Hosted agents require model in same account |
 | **05 - Agent Memory** | Memory API | Hybrid | Chat via APIM, but Memory API needs local embedding model |
 | **06 - Foundry IQ** | Knowledge bases | Connection | RAG via APIM for both chat and embeddings |
-| **07a - Built-in Tools** | File Search, Code Interpreter | Local | Built-in tools require direct model access |
+| **07a - Built-in Tools** | File Search, Code Interpreter | Hybrid | File Search requires local model, Code Interpreter works via APIM |
 | **07b - AI Gateway MCP** | MCP tool governance | APIM | Extends APIM to govern MCP tool calls |
-| **07b - BYO MCP Server** | Custom MCP server | Connection | MCP server via Azure Functions |
 | **07c - Web Search** | Bing grounding | Local | Web search tool requires local model |
 | **08 - Deep Research** | o3-deep-research | APIM | Full APIM support via Norway East hub |
 | **09 - Content Understanding** | Document/video analysis | Local | CU requires GPT-4.1 + embeddings in same resource |
-| **10 - Agent Registry** | Control Plane | Portal | Portal-based management, works with APIM agents |
 | **12 - Agent Workflow** | Multi-agent orchestration | APIM | Microsoft Agent Framework via APIM gateway |
 | **13 - Human-in-Loop** | Function approval | APIM | Works with APIM-based agents |
-| **15 - Observability** | OpenTelemetry tracing | APIM | Tracing works with APIM-based agents |
 | **16 - Local Evaluation** | Azure AI Evaluation SDK | APIM | Evaluators use APIM for judge model |
 
 ---
