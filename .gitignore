@@ -14,6 +14,7 @@ hosted-agent-project
 .foundry
 *.pyc
 apollo14.html
+_publish_guide_temp.html
 ntrs_data
 mcp_server.py
 mcp_test

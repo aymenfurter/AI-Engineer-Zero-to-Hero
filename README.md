@@ -331,6 +331,25 @@ Each phase builds upon the last. Follow Promptling through each adventure!
 <em>Connect to Microsoft 365 ecosystem</em>
 <br/><br/>
 <p>Extend your agents to work with Microsoft 365 services and Copilot.</p>
+
+<table>
+<thead>
+<tr>
+<th width="150">Lab</th>
+<th width="300">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="./11-agent-365">Lab 10A</a></td>
+<td>🧩 M365 Copilot Integration</td>
+</tr>
+<tr>
+<td><a href="./14b-m365-foundry-publish">Lab 10B</a></td>
+<td>🚀 Publish via Activity Protocol</td>
+</tr>
+</tbody>
+</table>
 </td>
 </tr>
 
@@ -550,8 +569,9 @@ microsoft-foundry-zero-to-hero/
 ├── 🔗 11-agent-365/                # M365 integration (Step 10)
 ├── 🔀 12-agent-workflow/           # Multi-agent orchestration
 ├── 👤 13-human-in-loop/            # Safety: Human approval
-├── 📊 14-m365-integration/         # Additional M365
-├── 👁️ 15-observability/            # Tracing & monitoring
+├── 14-m365-integration/         # Additional M365
+├── 14b-m365-foundry-publish/    # Publish Agents via Activity Protocol
+├── 15-observability/            # Tracing & monitoring
 ├── 📊 16-evaluation/               # AI quality evaluation
 └── 🔴 16-red-teaming/              # Safety: Red teaming
 ```

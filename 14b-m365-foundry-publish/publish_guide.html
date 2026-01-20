@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publish Agent to Microsoft Teams</title>
+    <style>
+        :root {
+            --vscode-bg: #1e1e1e;
+            --vscode-sidebar: #252526;
+            --vscode-border: #3c3c3c;
+            --vscode-text: #cccccc;
+            --vscode-text-muted: #858585;
+            --vscode-link: #3794ff;
+            --vscode-link-hover: #4da6ff;
+            --vscode-button: #0e639c;
+            --vscode-button-hover: #1177bb;
+            --vscode-success: #89d185;
+            --vscode-warning: #cca700;
+            --vscode-info: #75beff;
+            --vscode-card: #2d2d2d;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--vscode-bg);
+            color: var(--vscode-text);
+            line-height: 1.5;
+            padding: 24px;
+            font-size: 13px;
+        }
+        
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        
+        .subtitle { color: var(--vscode-text-muted); margin-bottom: 20px; font-size: 12px; }
+        
+        .card {
+            background: var(--vscode-card);
+            border: 1px solid var(--vscode-border);
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .card h2 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card h2 .step-number {
+            background: var(--vscode-button);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+        
+        .info-box {
+            background: rgba(55, 148, 255, 0.1);
+            border-left: 3px solid var(--vscode-info);
+            padding: 8px 12px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+            font-size: 12px;
+        }
+        
+        .info-box.warning {
+            background: rgba(204, 167, 0, 0.1);
+            border-left-color: var(--vscode-warning);
+        }
+        
+        .steps-list { list-style: none; margin: 10px 0; }
+        
+        .steps-list li {
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+            font-size: 12px;
+        }
+        
+        .steps-list li::before {
+            content: "›";
+            position: absolute;
+            left: 6px;
+            color: var(--vscode-text-muted);
+        }
+        
+        .screenshot {
+            margin: 12px 0;
+            border: 1px solid var(--vscode-border);
+            border-radius: 4px;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .screenshot img {
+            max-width: 400px;
+            height: auto;
+            display: block;
+        }
+        
+        .screenshot-caption {
+            background: var(--vscode-sidebar);
+            padding: 6px 10px;
+            font-size: 11px;
+            color: var(--vscode-text-muted);
+        }
+        
+        a { color: var(--vscode-link); text-decoration: none; }
+        a:hover { color: var(--vscode-link-hover); text-decoration: underline; }
+        
+        .button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--vscode-button);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 3px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .button:hover { background: var(--vscode-button-hover); text-decoration: none; color: white; }
+        
+        .button.secondary {
+            background: transparent;
+            border: 1px solid var(--vscode-border);
+            color: var(--vscode-text);
+        }
+        
+        .button.secondary:hover { background: var(--vscode-sidebar); }
+        
+        .button-group { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+        
+        .code {
+            background: var(--vscode-sidebar);
+            padding: 1px 4px;
+            border-radius: 2px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12px;
+        }
+        
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        
+        @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+        
+        .agent-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 12px;
+        }
+        
+        .detail-item {
+            background: var(--vscode-sidebar);
+            padding: 8px 10px;
+            border-radius: 3px;
+        }
+        
+        .detail-item .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--vscode-text-muted);
+            margin-bottom: 2px;
+        }
+        
+        .detail-item .value {
+            font-family: Consolas, Monaco, monospace;
+            font-size: 11px;
+            word-break: break-all;
+        }
+        
+        .footer {
+            color: var(--vscode-text-muted);
+            font-size: 11px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .completed-msg {
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: rgba(137, 209, 133, 0.15);
+            border: 1px solid var(--vscode-success);
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--vscode-success);
+        }
+        
+        .completed-msg .checkmark {
+            font-weight: bold;
+            margin-right: 4px;
+        }
+        
+        .button.completed {
+            background: var(--vscode-success);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Publish Agent to Microsoft Teams</h1>
+        <p class="subtitle">Complete the Teams integration for your Foundry agent</p>
+
+        <div class="two-col">
+            <div class="card">
+                <h2><span class="step-number">1</span> Publish in the Foundry Portal</h2>
+                <p>Open your agent in the portal, then:</p>
+                <ul class="steps-list">
+                    <li>Click <strong>"Publish"</strong> button (top right)</li>
+                    <li>Select <strong>"Publish to Teams"</strong></li>
+                    <li>Fill in metadata (description, developer, URLs)</li>
+                    <li>Choose scope: <strong>Shared</strong> or <strong>Private</strong></li>
+                    <li>Click <strong>Publish</strong></li>
+                </ul>
+                
+                <div class="button-group">
+                    <a href="{{PORTAL_URL}}" target="_blank" class="button" id="portal-btn" onclick="markCompleted()">Open Foundry Portal</a>
+                    <a href="https://learn.microsoft.com/azure/ai-services/agents/how-to/publish-agents" target="_blank" class="button secondary">Docs</a>
+                </div>
+                <div id="completed-msg" class="completed-msg" style="display:none;">
+                    <span class="checkmark">✓</span> Step completed - now publish in the portal
+                </div>
+                
+                <div class="screenshot">
+                    <img src="publish.png" alt="Foundry Portal Publish Button" onerror="this.parentElement.style.display='none'">
+                    <div class="screenshot-caption">The Publish button in the Microsoft AI Foundry portal</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><span class="step-number">2</span> Find Your Agent in Teams</h2>
+                <p>After publishing completes:</p>
+                <ul class="steps-list">
+                    <li>Open <strong>Microsoft Teams</strong></li>
+                    <li>Click <strong>Copilot</strong> in the sidebar</li>
+                    <li>Click <span class="code">@</span> or type @</li>
+                    <li>Search for <strong>"{{AGENT_NAME}}"</strong></li>
+                    <li>Select and start chatting</li>
+                </ul>
+                
+                <div class="screenshot">
+                    <img src="access.png" alt="Finding agent in Teams Copilot" onerror="this.parentElement.style.display='none'">
+                    <div class="screenshot-caption">Find your agent via @ in Teams Copilot</div>
+                </div>
+                
+                <div class="info-box warning">
+                    It may take a few minutes for your agent to appear. Shared scope may require admin approval.
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            Lab 14b | <a href="https://learn.microsoft.com/azure/ai-services/agents/" target="_blank">Microsoft AI Foundry Docs</a>
+        </div>
+    </div>
+    
+    <script>
+        function markCompleted() {
+            setTimeout(function() {
+                document.getElementById('portal-btn').textContent = 'Portal Opened';
+                document.getElementById('portal-btn').classList.add('completed');
+                document.getElementById('completed-msg').style.display = 'block';
+            }, 100);
+        }
+    </script>
+</body>
+</html>
