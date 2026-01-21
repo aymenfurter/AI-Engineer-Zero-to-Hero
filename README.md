@@ -192,7 +192,7 @@ Each phase builds upon the last. Follow Promptling through each adventure!
 <img src="00-image-generation/assets/09_container_256.png" alt="Container" width="150"/>
 </td>
 <td width="800" valign="top">
-<h4><a href="./04-agent-architecture">Step 04: Hosted Agents</a></h4>
+<h4><a href="./04-hosted-agents">Step 04: Hosted Agents</a></h4>
 <em>Deploy containerized agents with Azure Developer CLI</em>
 <br/><br/>
 <p>Use the official <code>Azure-Samples/ai-foundry-starter-basic</code> template to deploy production-ready hosted agents on Azure Container Apps.</p>
@@ -559,7 +559,7 @@ AI-Engineer-Zero-to-Hero/
 │   └── lab-1c-model-router/
 ├── 🔄 02-inference/                # Unified inference
 ├── 🛡️ 03-governance-policy/        # Azure Policy
-├── 📦 04-agent-architecture/       # Hosted agents
+├── 📦 04-hosted-agents/            # Hosted agents
 ├── 🧠 05-agent-memory/             # Memory service
 ├── 🔍 06-foundry-iq/               # Knowledge & RAG
 ├── 🔧 07-tool-catalog/             # Tools & MCP
