@@ -1,32 +1,14 @@
+// Lab 8: Deep Research - Spoke Resources
+// Deploys Azure AI Search for Foundry IQ knowledge bases
+// o3-deep-research model is deployed in Landing Zone (Lab 1a) and accessed via APIM
+
 targetScope = 'resourceGroup'
 
 param location string = resourceGroup().location
 param deployerPrincipalId string
 
-// Landing Zone parameters (from Lab 1a .env)
-param hubResourceGroup string
-param hubAccountName string
-param apimName string = ''  // Optional - only needed if adding APIM operations
-
 var suffix = substring(uniqueString(resourceGroup().id), 0, 6)
 var searchName = 'search-dr-${suffix}'
-
-// Get APIM principal ID for RBAC (if APIM name provided)
-resource existingApim 'Microsoft.ApiManagement/service@2024-06-01-preview' existing = if (!empty(apimName)) {
-  name: apimName
-  scope: resourceGroup(hubResourceGroup)
-}
-
-// Deploy secondary hub in norwayeast for o3-deep-research
-// This model requires specific regions - demonstrates multi-region Landing Zone pattern
-module norwayeastHub 'norwayeast-hub.bicep' = {
-  name: 'deploy-norwayeast-hub'
-  params: {
-    location: 'norwayeast'
-    deployerPrincipalId: deployerPrincipalId
-    apimPrincipalId: !empty(apimName) ? existingApim.identity.principalId : ''
-  }
-}
 
 // Azure AI Search for Foundry IQ
 resource search 'Microsoft.Search/searchServices@2024-06-01-preview' = {
@@ -68,18 +50,5 @@ resource deployerSearchServiceContributor 'Microsoft.Authorization/roleAssignmen
   }
 }
 
-// Add Responses API operation to APIM for Deep Research with norwayeast backend
-module apimResponsesApi 'apim-responses-api.bicep' = if (!empty(apimName)) {
-  name: 'add-responses-api'
-  scope: resourceGroup(hubResourceGroup)
-  params: {
-    apimName: apimName
-    norwayeastEndpoint: norwayeastHub.outputs.aiEndpoint
-  }
-}
-
 output searchEndpoint string = 'https://${search.name}.search.windows.net'
 output searchName string = search.name
-output deepResearchModel string = norwayeastHub.outputs.modelName
-output norwayeastHubEndpoint string = norwayeastHub.outputs.aiEndpoint
-output norwayeastHubName string = norwayeastHub.outputs.aiAccountName
