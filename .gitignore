@@ -24,3 +24,20 @@ team-deployments.json
 .foundry
 .DS_Store
 mars-agent
+
+17b-fine-tuning-iss/data
+
+# 17b-fine-tuning
+17b-fine-tuning/data/
+17b-fine-tuning/models/
+17b-fine-tuning/debug_*.py
+17b-fine-tuning/*.json
+17b-fine-tuning/*.log
+
+# 17b-fine-tuning-iss
+17b-fine-tuning-iss/data/
+17b-fine-tuning-iss/models/
+17b-fine-tuning-iss/cache_dir/
+17b-fine-tuning-iss/.olive-cache/
+17b-fine-tuning-iss/*.json
+17b-fine-tuning-iss/*.yaml

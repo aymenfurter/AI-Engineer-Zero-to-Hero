@@ -3,11 +3,16 @@ targetScope = 'resourceGroup'
 param location string = resourceGroup().location
 param deployerPrincipalId string
 
+@description('Location for DeepSeek-V3.2 deployment. Must be westus3, australiaeast, or swedencentral.')
+@allowed(['westus3', 'australiaeast', 'swedencentral'])
+param deepSeekLocation string = 'westus3'
+
 var suffix = substring(uniqueString(resourceGroup().id), 0, 6)
 var aiAccountName = 'foundry-hub-${suffix}'
 var storageName = 'foundryhub${suffix}'
 var apimName = 'foundry-apim-${suffix}'
 var norwayeastHubName = 'foundry-hub-norwayeast-${suffix}'
+var deepseekHubName = 'foundry-hub-deepseek-${suffix}'
 
 resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: storageName
@@ -50,6 +55,37 @@ resource embeddingModel 'Microsoft.CognitiveServices/accounts/deployments@2025-0
     model: { name: 'text-embedding-3-large', format: 'OpenAI', version: '1' }
   }
   dependsOn: [model]
+}
+
+// =============================================================================
+// DEEPSEEK HUB (westus3/australiaeast/swedencentral) - DeepSeek-V3.2
+// =============================================================================
+
+resource deepseekHub 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
+  name: deepseekHubName
+  location: deepSeekLocation
+  kind: 'AIServices'
+  sku: { name: 'S0' }
+  identity: { type: 'SystemAssigned' }
+  properties: {
+    customSubDomainName: deepseekHubName
+    publicNetworkAccess: 'Enabled'
+  }
+
+  resource deepseekDeployment 'deployments' = {
+    name: 'DeepSeek-V3.2'
+    properties: {
+      model: {
+        name: 'DeepSeek-V3.2'
+        format: 'DeepSeek'
+        version: '1'
+      }
+    }
+    sku: {
+      name: 'GlobalStandard'
+      capacity: 250
+    }
+  }
 }
 
 // =============================================================================
@@ -118,6 +154,17 @@ resource apimCognitiveServicesUserNorwayeast 'Microsoft.Authorization/roleAssign
   }
 }
 
+// Grant APIM managed identity access to DeepSeek hub
+resource apimCognitiveServicesUserDeepseek 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(deepseekHub.id, apim.id, 'CognitiveServicesUser')
+  scope: deepseekHub
+  properties: {
+    principalId: apim.identity.principalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a97b65f3-24c7-4388-baec-2e87135dc908') // Cognitive Services User
+  }
+}
+
 // Grant deploying user access to primary hub
 resource deployerCognitiveServicesUser 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(aiAccount.id, deployerPrincipalId, 'CognitiveServicesUser')
@@ -133,6 +180,17 @@ resource deployerCognitiveServicesUser 'Microsoft.Authorization/roleAssignments@
 resource deployerCognitiveServicesUserNorwayeast 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(norwayeastHub.id, deployerPrincipalId, 'CognitiveServicesUser')
   scope: norwayeastHub
+  properties: {
+    principalId: deployerPrincipalId
+    principalType: 'User'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a97b65f3-24c7-4388-baec-2e87135dc908') // Cognitive Services User
+  }
+}
+
+// Grant deploying user access to DeepSeek hub
+resource deployerCognitiveServicesUserDeepseek 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(deepseekHub.id, deployerPrincipalId, 'CognitiveServicesUser')
+  scope: deepseekHub
   properties: {
     principalId: deployerPrincipalId
     principalType: 'User'
@@ -157,6 +215,17 @@ resource norwayeastBackend 'Microsoft.ApiManagement/service/backends@2024-06-01-
     url: '${norwayeastHub.properties.endpoint}openai'
     protocol: 'http'
     description: 'Norway East hub for o3-deep-research model'
+  }
+}
+
+// Backend for DeepSeek hub
+resource deepseekBackend 'Microsoft.ApiManagement/service/backends@2024-06-01-preview' = {
+  parent: apim
+  name: 'openai-deepseek'
+  properties: {
+    url: '${deepseekHub.properties.endpoint}openai'
+    protocol: 'http'
+    description: 'DeepSeek hub for DeepSeek-V3.2 model'
   }
 }
 
@@ -208,6 +277,27 @@ resource chatNorwayeastPolicy 'Microsoft.ApiManagement/service/apis/operations/p
   properties: {
     format: 'xml'
     value: '<policies><inbound><base /><set-backend-service backend-id="openai-norwayeast" /><authentication-managed-identity resource="https://cognitiveservices.azure.com" output-token-variable-name="msi-access-token" ignore-error="false" /><set-header name="Authorization" exists-action="override"><value>@("Bearer " + (string)context.Variables["msi-access-token"])</value></set-header></inbound><backend><base /></backend><outbound><base /></outbound></policies>'
+  }
+}
+
+// Chat Completions for DeepSeek-V3.2 (routes to DeepSeek backend)
+resource chatDeepseekOp 'Microsoft.ApiManagement/service/apis/operations@2024-06-01-preview' = {
+  parent: api
+  name: 'chat-deepseek'
+  properties: {
+    displayName: 'Chat Completions (DeepSeek-V3.2)'
+    method: 'POST'
+    urlTemplate: '/deployments/DeepSeek-V3.2/chat/completions'
+  }
+}
+
+// Policy to route DeepSeek-V3.2 chat to DeepSeek backend
+resource chatDeepseekPolicy 'Microsoft.ApiManagement/service/apis/operations/policies@2024-06-01-preview' = {
+  parent: chatDeepseekOp
+  name: 'policy'
+  properties: {
+    format: 'xml'
+    value: '<policies><inbound><base /><set-backend-service backend-id="openai-deepseek" /><authentication-managed-identity resource="https://cognitiveservices.azure.com" output-token-variable-name="msi-access-token" ignore-error="false" /><set-header name="Authorization" exists-action="override"><value>@("Bearer " + (string)context.Variables["msi-access-token"])</value></set-header></inbound><backend><base /></backend><outbound><base /></outbound></policies>'
   }
 }
 
@@ -266,5 +356,7 @@ output apimName string = apim.name
 output apimSubscriptionName string = apimSubscription.name
 output modelName string = model.name
 output embeddingModelName string = embeddingModel.name
+output deepseekModelName string = 'DeepSeek-V3.2'
+output deepseekEndpoint string = deepseekHub.properties.endpoint
 output deepResearchModelName string = deepResearchModel.name
 output norwayeastHubEndpoint string = norwayeastHub.properties.endpoint
