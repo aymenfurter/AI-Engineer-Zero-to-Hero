@@ -43,3 +43,6 @@ mars-agent
 17b-fine-tuning-iss/*.yaml
 
 .test-output
+cme_cache.json
+
+__pycache__

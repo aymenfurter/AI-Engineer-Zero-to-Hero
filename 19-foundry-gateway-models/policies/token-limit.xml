@@ -1,0 +1,19 @@
+<policies>
+    <inbound>
+        <base />
+        <!-- Simple token limit: 10,000 TPM per product/deployment -->
+        <llm-token-limit 
+            counter-key="@("product/"+ context.Product?.Id + "/deployment/" + (string)context.Request.Foundry.Deployment)"
+            tokens-per-minute="10000"
+            estimate-prompt-tokens="false" />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

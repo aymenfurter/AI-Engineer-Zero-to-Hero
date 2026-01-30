@@ -1,0 +1,40 @@
+<policies>
+    <inbound>
+        <base />
+        <!-- Rate limit: 60 requests per minute per subscription -->
+        <rate-limit-by-key 
+            calls="60" 
+            renewal-period="60" 
+            counter-key="@(context.Subscription.Id)" 
+            retry-after-header-name="Retry-After" />
+        <!-- Quota: 1000 requests per day per subscription -->
+        <quota-by-key 
+            calls="1000" 
+            renewal-period="86400" 
+            counter-key="@(context.Subscription.Id)" />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+        <!-- Add rate limit info to headers -->
+        <set-header name="X-RateLimit-Limit" exists-action="override">
+            <value>60</value>
+        </set-header>
+    </outbound>
+    <on-error>
+        <base />
+        <choose>
+            <when condition="@(context.Response.StatusCode == 429)">
+                <return-response>
+                    <set-status code="429" reason="Rate limit exceeded" />
+                    <set-header name="Content-Type" exists-action="override">
+                        <value>application/json</value>
+                    </set-header>
+                    <set-body>{"error": {"code": "RateLimitExceeded", "message": "You have exceeded your rate limit. Please wait and try again."}}</set-body>
+                </return-response>
+            </when>
+        </choose>
+    </on-error>
+</policies>
