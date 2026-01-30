@@ -46,3 +46,4 @@ mars-agent
 cme_cache.json
 
 __pycache__
+spoke-config.json
