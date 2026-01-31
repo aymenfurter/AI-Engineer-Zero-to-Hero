@@ -6,22 +6,34 @@
         *{margin:0;padding:0}
         body{background:#0a0a0f;overflow:hidden}
         canvas{display:block}
-        .info{position:fixed;bottom:20px;left:20px;color:#444;font:12px monospace}
+        .info{position:fixed;bottom:20px;left:20px;color:#444;font:12px monospace; background: rgba(10,10,15,0.8); padding:8px 12px; border-radius:6px; max-width:220px;}
         .info span{color:#888}
     </style>
 </head>
 <body>
-<div class="info"><span id="n">11700</span> satellites in orbit</div>
+<div class="info">
+    <div><b><span id="n-total">0</span></b> satellites in orbit (total)</div>
+    <div><b><span id="n-starlink">0</span></b> Starlink (SpaceX)</div>
+    <div><b><span id="n-oneweb">0</span></b> OneWeb</div>
+    <div style="margin-top:8px;font-size:11px;line-height:1.3;color:#666;">
+        Majority of satellites are in <b>LEO</b> (low Earth orbit)<br>
+        Some in <b>MEO</b> (medium Earth orbit) and <b>GEO</b> (geostationary)
+    </div>
+</div>
 <canvas id="c"></canvas>
 <script>
-const TOTAL = 11700; // Updated from research
-const DISPLAY = 800;
+const TOTAL = 14000;           // Approximate total operational satellites (2026)
+const STARLINK = 9400;         // Starlink satellites active
+const ONEWEB = 600;            // OneWeb satellites active
+const DISPLAY = 800;           // Number of satellites to visualize for performance (subset)
 
+// Context setup
 const c = document.getElementById('c');
 const gl = c.getContext('webgl');
 c.width = innerWidth; c.height = innerHeight;
 gl.viewport(0,0,c.width,c.height);
 
+// Vertex Shader
 const vs = `
 attribute vec3 p;
 uniform mat4 m;
@@ -29,6 +41,7 @@ void main(){
     gl_Position = m * vec4(p,1.0);
     gl_PointSize = 1.5;
 }`;
+// Fragment Shader
 const fs = `
 precision lowp float;
 void main(){
@@ -46,7 +59,7 @@ gl.linkProgram(pg); gl.useProgram(pg);
 const pLoc = gl.getAttribLocation(pg,'p');
 const mLoc = gl.getUniformLocation(pg,'m');
 
-// Earth
+// Earth points (sphere representation)
 const earth = [];
 for(let i=0;i<3000;i++){
     const u = Math.random()*Math.PI*2, v = Math.acos(2*Math.random()-1);
@@ -56,16 +69,29 @@ const eBuf = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, eBuf);
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(earth), gl.STATIC_DRAW);
 
-// Satellites
+// Satellites orbits model: create positions for displayed satellites (subset)
 const sats = [];
 for(let i=0;i<DISPLAY;i++){
-    const r = 1.1 + Math.random()*0.8;
-    const inc = (Math.random()*0.7+0.1)*Math.PI;
+    // Randomize orbits to imitate various altitudes and inclinations:
+    // - r = distance from Earth center (1.1 to ~1.9) roughly mapping LEO, MEO, GEO radii scale
+    // More satellites in lower orbit region (LEO)
+    let r, inc;
+    if(i < DISPLAY * 0.85){ // 85% in LEO
+        r = 1.1 + Math.random()*0.3;          // LEO ~1.1 to 1.4 radius layers
+        inc = (Math.random()*0.7+0.1)*Math.PI;
+    } else if(i < DISPLAY * 0.95){ // 10% in MEO
+        r = 1.45 + Math.random()*0.2;         // MEO ~1.45 to 1.65
+        inc = (Math.random()*0.2+0.1)*Math.PI / 2; // mostly near equatorial to mid inclinations
+    } else { // 5% GEO
+        r = 1.68 + Math.random()*0.2;         // GEO ~1.68 to 1.88
+        inc = 0; // GEO satellites are mostly equatorial
+    }
     const raan = Math.random()*Math.PI*2;
     const ph = Math.random()*Math.PI*2;
     const sp = 0.002 + Math.random()*0.008;
     sats.push({r,inc,raan,ph,sp});
 }
+
 const satPos = new Float32Array(DISPLAY*3);
 const sBuf = gl.createBuffer();
 
@@ -102,7 +128,7 @@ function draw(){
     const mvp = mult(proj,view);
     gl.uniformMatrix4fv(mLoc, false, mvp);
 
-    // Draw earth
+    // Draw Earth sphere points
     gl.bindBuffer(gl.ARRAY_BUFFER, eBuf);
     gl.enableVertexAttribArray(pLoc);
     gl.vertexAttribPointer(pLoc,3,gl.FLOAT,false,0,0);
@@ -114,8 +140,7 @@ function draw(){
         s.ph+=s.sp;
         let x=s.r*Math.cos(s.ph), y=0, z=s.r*Math.sin(s.ph);
         const ci=Math.cos(s.inc),si=Math.sin(s.inc);
-        const y1=y*ci-z*si;
-        const z1=y*si+z*ci;
+        const y1=y*ci-z*si, z1=y*si+z*ci;
         const cr=Math.cos(s.raan),sr=Math.sin(s.raan);
         satPos[i*3]=x*cr+z1*sr; satPos[i*3+1]=y1; satPos[i*3+2]=-x*sr+z1*cr;
     }
@@ -127,7 +152,11 @@ function draw(){
     requestAnimationFrame(draw);
 }
 
-document.getElementById('n').textContent = TOTAL.toLocaleString();
+// Show satellite counts in the info panel
+document.getElementById('n-total').textContent = TOTAL.toLocaleString();
+document.getElementById('n-starlink').textContent = STARLINK.toLocaleString();
+document.getElementById('n-oneweb').textContent = ONEWEB.toLocaleString();
+
 onresize=()=>{c.width=innerWidth;c.height=innerHeight;gl.viewport(0,0,c.width,c.height);};
 draw();
 </script>

@@ -2,7 +2,7 @@
   "$schema": "./spoke-config.schema.json",
   "description": "Enterprise AI Foundry Spoke Configuration - Defines team projects and their model access via the central Landing Zone APIM gateway",
   "landingZone": {
-    "resourceGroup": "foundry-lz-parent",
+    "resourceGroup": "lab1a-foundry-lz-hub",
     "apimUrl": "${APIM_URL}",
     "apimKey": "${APIM_KEY}",
     "availableModels": [
@@ -68,3 +68,4 @@
     }
   ]
 }
+

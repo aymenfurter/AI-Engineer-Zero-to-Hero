@@ -141,11 +141,21 @@ class SelectExecutor(Executor):
         try:
             response = await self._researcher_agent.run(
                 [ChatMessage(role=Role.USER, text=prompt)],
-                response_format=ImageSelection
+                options={"response_format": ImageSelection}
             )
             
-            if response.value:
-                selection = response.value
+            # Try to get structured value, or parse from text
+            selection = response.value
+            if not selection and response.text:
+                try:
+                    selection = ImageSelection.model_validate_json(response.text)
+                except Exception:
+                    import re
+                    json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
+                    if json_match:
+                        selection = ImageSelection.model_validate_json(json_match.group())
+            
+            if selection:
                 # Find the full image data
                 image_data = self._find_image(selection.nasa_id, state.current_candidates)
                 if image_data:
@@ -243,11 +253,21 @@ class ReviewExecutor(Executor):
         try:
             response = await self._reviewer_agent.run(
                 [ChatMessage(role=Role.USER, text=prompt)],
-                response_format=ReviewResult
+                options={"response_format": ReviewResult}
             )
             
-            if response.value:
-                review = response.value
+            # Try to get structured value, or parse from text
+            review = response.value
+            if not review and response.text:
+                try:
+                    review = ReviewResult.model_validate_json(response.text)
+                except Exception:
+                    import re
+                    json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
+                    if json_match:
+                        review = ReviewResult.model_validate_json(json_match.group())
+            
+            if review:
                 
                 # Record the attempt
                 state.record_attempt(
@@ -377,11 +397,21 @@ class JudgeExecutor(Executor):
         try:
             response = await self._judge_agent.run(
                 [ChatMessage(role=Role.USER, text=prompt)],
-                response_format=ImageSelection
+                options={"response_format": ImageSelection}
             )
             
-            if response.value:
-                selection = response.value
+            # Try to get structured value, or parse from text
+            selection = response.value
+            if not selection and response.text:
+                try:
+                    selection = ImageSelection.model_validate_json(response.text)
+                except Exception:
+                    import re
+                    json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
+                    if json_match:
+                        selection = ImageSelection.model_validate_json(json_match.group())
+            
+            if selection:
                 
                 # Find thumbnail from history
                 thumbnail_url = None

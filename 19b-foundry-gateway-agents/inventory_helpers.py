@@ -491,7 +491,7 @@ def unblock_custom_agent(
 # CONFIGURATION HELPERS
 # =============================================================================
 
-def load_env_config(env_path: str = "/workspaces/getting-started-with-foundry/.env") -> dict:
+def load_env_config(env_path: str = "../.env") -> dict:
     """Load configuration from .env file and Azure CLI."""
     config = {}
     

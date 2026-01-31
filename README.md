@@ -622,6 +622,29 @@ Contributions are welcome! Please read our contributing guidelines and submit a 
 
 ---
 
+## Contributors
+
+<table>
+<tr>
+<td align="center">
+<a href="https://github.com/aymenfurter">
+<img src="https://github.com/aymenfurter.png" width="100px;" alt="Aymen Furter"/>
+<br />
+<sub><b>Aymen Furter</b></sub>
+</a>
+</td>
+<td align="center">
+<a href="https://github.com/HaoZhang615">
+<img src="https://github.com/HaoZhang615.png" width="100px;" alt="Hao Zhang"/>
+<br />
+<sub><b>Hao Zhang</b></sub>
+</a>
+</td>
+</tr>
+</table>
+
+---
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

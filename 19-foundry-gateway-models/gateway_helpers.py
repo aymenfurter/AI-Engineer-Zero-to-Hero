@@ -169,7 +169,7 @@ def discover_spokes() -> list[dict]:
         if lz_account:
             spokes.append({
                 "name": lz_account,
-                "rg": "foundry-lz-parent",
+                "rg": "lab1a-foundry-lz-hub",
                 "lab": "Lab 1A (Landing Zone)"
             })
     
@@ -177,7 +177,7 @@ def discover_spokes() -> list[dict]:
     if os.environ.get('SPOKE_ACCOUNT'):
         spokes.append({
             "name": os.environ['SPOKE_ACCOUNT'],
-            "rg": "foundry-child-1",
+            "rg": "lab1b-foundry-spoke",
             "lab": "Lab 1B"
         })
     

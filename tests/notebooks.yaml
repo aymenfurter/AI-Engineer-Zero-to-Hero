@@ -11,20 +11,17 @@ settings:
 # Resource groups to clean up after tests
 cleanup:
   resource_groups:
-    - foundry-lz-parent
-    - foundry-child-1
-    - foundry-contoso
-    - foundry-fabrikam
-    - foundry-woodgrove
-    - foundry-mars-*
-    - foundry-memory-spoke
-    - foundryiq-lab
-    - foundry-builtin-tools
-    - foundry-mcp-rg
-    - bing-grounding-lab
-    - deep-research-lab-rg
-    - content-understanding-lab-rg
-    - red-teaming-lab-rg
+    - lab1a-foundry-lz-hub
+    - lab1b-foundry-spoke
+    - lab04-mars-agents-*
+    - lab05-agent-memory
+    - lab06-foundry-iq
+    - lab7a-builtin-tools
+    - lab7b-byo-mcp
+    - lab7c-bing-grounding
+    - lab08-deep-research
+    - lab09-content-understanding
+    - lab14b-m365-foundry
   
   purge_cognitive_services: true
 
@@ -39,7 +36,7 @@ notebooks:
     path: 01-project-setup/lab-1a-landing-zone/deploy.ipynb
     description: Deploy central Landing Zone with APIM gateway
     timeout_minutes: 20
-    resource_group: foundry-lz-parent
+    resource_group: lab1a-foundry-lz-hub
     depends_on: []  # No dependencies - runs first
     skip_cells:
       - 3   # az login (manual)
@@ -53,7 +50,7 @@ notebooks:
     path: 01-project-setup/lab-1b-project-spoke/deploy.ipynb
     description: Deploy project spoke connected to Landing Zone
     timeout_minutes: 10
-    resource_group: foundry-child-1
+    resource_group: lab1b-foundry-spoke
     depends_on: [lab-1a-landing-zone]  # Needs .env from 1a
     skip_cells:
       - 17  # cleanup (commented)
@@ -63,7 +60,7 @@ notebooks:
     path: 01-project-setup/lab-1c-model-router/deploy.ipynb
     description: Add Model Router to Landing Zone
     timeout_minutes: 10
-    resource_group: foundry-lz-parent
+    resource_group: lab1a-foundry-lz-hub
     depends_on: [lab-1b-project-spoke]  # Updates spoke connection from 1b
     skip_cells:
       - 17  # cleanup (commented)
@@ -108,7 +105,7 @@ notebooks:
     path: 05-agent-memory/deploy.ipynb
     description: Agent memory and state management
     timeout_minutes: 15
-    resource_group: foundry-memory-spoke
+    resource_group: lab05-agent-memory
     depends_on: [lab-1a-landing-zone]  # Needs APIM from 1a
 
   # ═══════════════════════════════════════════════════════════════════════
@@ -120,7 +117,7 @@ notebooks:
   #   path: 06-foundry-iq/main.ipynb
   #   description: Knowledge retrieval with Foundry IQ
   #   timeout_minutes: 15
-  #   resource_group: foundryiq-lab
+  #   resource_group: lab06-foundry-iq
   #   depends_on: [lab-1a-landing-zone]  # Needs APIM from 1a
 
   # DISABLED: Infrastructure deployment issues
@@ -128,14 +125,14 @@ notebooks:
   #   path: 07-tool-catalog/lab-7a-builtin-tools/main.ipynb
   #   description: Built-in tools (Code Interpreter, File Search)
   #   timeout_minutes: 15
-  #   resource_group: foundry-builtin-tools
+  #   resource_group: lab7a-builtin-tools
   #   depends_on: []  # Standalone - deploys own resources
 
   - name: lab-7c-bing-grounding
     path: 07-tool-catalog/lab-7c-bing-grounding/deploy.ipynb
     description: Web search grounding for agents
     timeout_minutes: 15
-    resource_group: bing-grounding-lab
+    resource_group: lab7c-bing-grounding
     depends_on: [lab-1a-landing-zone]  # Needs APIM from 1a
 
   # ═══════════════════════════════════════════════════════════════════════
@@ -147,7 +144,7 @@ notebooks:
   #   path: 08-deep-research/deploy.ipynb
   #   description: Deep research with o3-deep-research model
   #   timeout_minutes: 20
-  #   resource_group: deep-research-lab-rg
+  #   resource_group: lab08-deep-research
   #   depends_on: [lab-1a-landing-zone]  # Deploys to hub from 1a
 
   # DISABLED: Takes too long to test (900s+)
@@ -155,7 +152,7 @@ notebooks:
   #   path: 09-content-understanding/deploy.ipynb
   #   description: Document and video analysis
   #   timeout_minutes: 15
-  #   resource_group: content-understanding-lab-rg
+  #   resource_group: lab09-content-understanding
   #   depends_on: []  # Standalone - deploys own AI Services
 
   # ═══════════════════════════════════════════════════════════════════════
@@ -190,7 +187,7 @@ notebooks:
   #   path: 16-red-teaming/main.ipynb
   #   description: Security testing with red teaming
   #   timeout_minutes: 15
-  #   resource_group: red-teaming-lab-rg
+  #   resource_group: lab06-foundry-iq
   #   depends_on: [lab-1a-landing-zone]  # Needs hub from 1a
 
 # ─────────────────────────────────────────────────────────────────────────

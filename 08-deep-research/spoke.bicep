@@ -1,8 +1,8 @@
 // Spoke deployment for Deep Research Lab
 // Deploys:
-// - o3-deep-research model in the Landing Zone hub
 // - Azure AI Search for Foundry IQ knowledge bases
 // - Required RBAC permissions
+// NOTE: o3-deep-research model is already deployed in Lab 1a Norway East hub
 
 targetScope = 'resourceGroup'
 
@@ -18,19 +18,15 @@ param apimName string
 var suffix = substring(uniqueString(subscription().subscriptionId, resourceGroup().id), 0, 6)
 var searchName = 'search-dr-${suffix}'
 
-// Reference to existing Landing Zone hub
-resource hubAccount 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' existing = {
-  name: hubAccountName
-  scope: resourceGroup(hubResourceGroup)
-}
+// Derive Norway East hub name from hub account name pattern
+// Lab 1a creates: foundry-hub-{suffix} and foundry-hub-norwayeast-{suffix}
+var hubSuffix = substring(hubAccountName, length('foundry-hub-'))
+var norwayeastHubName = 'foundry-hub-norwayeast-${hubSuffix}'
 
-// Deploy o3-deep-research model in the hub (via module for cross-RG deployment)
-module deepResearchModel 'deep-research-model.bicep' = {
-  name: 'deploy-deep-research-model'
+// Reference to existing Norway East hub (deployed in Lab 1a with o3-deep-research)
+resource norwayeastHub 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' existing = {
+  name: norwayeastHubName
   scope: resourceGroup(hubResourceGroup)
-  params: {
-    hubAccountName: hubAccountName
-  }
 }
 
 // Azure AI Search for Foundry IQ
@@ -44,6 +40,11 @@ resource search 'Microsoft.Search/searchServices@2024-06-01-preview' = {
     partitionCount: 1
     replicaCount: 1
     semanticSearch: 'standard'
+    authOptions: {
+      aadOrApiKey: {
+        aadAuthFailureMode: 'http401WithBearerChallenge'
+      }
+    }
   }
 }
 
@@ -69,15 +70,10 @@ resource deployerSearchServiceContributor 'Microsoft.Authorization/roleAssignmen
   }
 }
 
-// Add Responses API operation to APIM for Deep Research
-module apimResponsesApi 'apim-responses-api.bicep' = {
-  name: 'add-responses-api'
-  scope: resourceGroup(hubResourceGroup)
-  params: {
-    apimName: apimName
-  }
-}
+// NOTE: APIM backends and operations for o3-deep-research are already deployed in Lab 1a main.bicep
+// No need to redeploy them here - this avoids conflicts and duplication
 
 output searchEndpoint string = 'https://${search.name}.search.windows.net'
 output searchName string = search.name
-output deepResearchModel string = deepResearchModel.outputs.modelName
+output norwayeastHubEndpoint string = norwayeastHub.properties.endpoint
+output norwayeastHubName string = norwayeastHub.name

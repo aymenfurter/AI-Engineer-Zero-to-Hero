@@ -8,7 +8,7 @@ def create_slideshow_workflow(
     researcher_agent: ChatAgent,
     reviewer_agent: ChatAgent,
     judge_agent: ChatAgent,
-    max_iterations: int = 12
+    max_iterations: int = 50
 ) -> Workflow:
     search = SearchExecutor()
     select = SelectExecutor(researcher_agent)

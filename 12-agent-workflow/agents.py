@@ -2,7 +2,7 @@
 import asyncio
 from typing import AsyncIterator, Optional, Callable, Any
 
-from agent_framework import ChatMessage, Role
+from agent_framework import ChatMessage, Role, ChatAgent
 from agent_framework.openai import OpenAIChatClient
 
 from models import PresentationOutline, SlideOutlineItem, FinalSlide
@@ -67,29 +67,29 @@ class SlideshowOrchestrator:
         )
         self._model = deployment_name
         
-        # Create specialized agents
-        self._planner_agent = self._chat_client.create_agent(
-            name="PlannerAgent",
+        # Create specialized agents using ChatAgent with the shared client
+        self._planner_agent = ChatAgent(
+            chat_client=self._chat_client,
             instructions=PLANNER_AGENT_INSTRUCTIONS,
-            model=deployment_name,
+            name="PlannerAgent",
         )
         
-        self._researcher_agent = self._chat_client.create_agent(
-            name="ResearcherAgent",
+        self._researcher_agent = ChatAgent(
+            chat_client=self._chat_client,
             instructions=RESEARCHER_AGENT_INSTRUCTIONS,
-            model=deployment_name,
+            name="ResearcherAgent",
         )
         
-        self._reviewer_agent = self._chat_client.create_agent(
-            name="ReviewerAgent",
+        self._reviewer_agent = ChatAgent(
+            chat_client=self._chat_client,
             instructions=REVIEWER_AGENT_INSTRUCTIONS,
-            model=deployment_name,
+            name="ReviewerAgent",
         )
         
-        self._judge_agent = self._chat_client.create_agent(
-            name="JudgeAgent",
+        self._judge_agent = ChatAgent(
+            chat_client=self._chat_client,
             instructions=JUDGE_AGENT_INSTRUCTIONS,
-            model=deployment_name,
+            name="JudgeAgent",
         )
         
         # Create the workflow
@@ -123,13 +123,26 @@ Remember:
 
         response = await self._planner_agent.run(
             [ChatMessage(role=Role.USER, text=prompt)],
-            response_format=PresentationOutline
+            options={"response_format": PresentationOutline}
         )
         
+        # Try to get structured value, or parse from text
         if response.value:
             return response.value
         
-        raise ValueError("Failed to generate presentation outline")
+        # If value is None, try to parse the text response
+        if response.text:
+            try:
+                return PresentationOutline.model_validate_json(response.text)
+            except Exception:
+                # Try to extract JSON from text
+                import json
+                import re
+                json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
+                if json_match:
+                    return PresentationOutline.model_validate_json(json_match.group())
+        
+        raise ValueError(f"Failed to generate presentation outline. Response: {response.text[:500] if response.text else 'No response'}")
     
     async def select_image_for_slide(
         self,

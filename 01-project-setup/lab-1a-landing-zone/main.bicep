@@ -22,10 +22,6 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   sku: { name: 'Standard_LRS' }
 }
 
-// =============================================================================
-// PRIMARY HUB (eastus2) - gpt-4.1-mini, text-embedding-3-large
-// =============================================================================
-
 resource aiAccount 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' = {
   name: aiAccountName
   location: location
@@ -51,7 +47,7 @@ resource model 'Microsoft.CognitiveServices/accounts/deployments@2025-04-01-prev
 resource embeddingModel 'Microsoft.CognitiveServices/accounts/deployments@2025-04-01-preview' = {
   parent: aiAccount
   name: 'text-embedding-3-large'
-  sku: { name: 'Standard', capacity: 350 }
+  sku: { name: 'Standard', capacity: 50 }
   properties: {
     model: { name: 'text-embedding-3-large', format: 'OpenAI', version: '1' }
   }
@@ -133,7 +129,7 @@ resource apim 'Microsoft.ApiManagement/service@2024-06-01-preview' = {
   }
 }
 
-// Grant APIM managed identity access to primary hub (eastus2)
+// Grant APIM managed identity access to AI Services
 resource apimCognitiveServicesUser 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(aiAccount.id, apim.id, 'CognitiveServicesUser')
   scope: aiAccount
@@ -242,7 +238,6 @@ resource api 'Microsoft.ApiManagement/service/apis@2024-06-01-preview' = {
       header: 'api-key'
       query: 'api-key'
     }
-    serviceUrl: '${aiAccount.properties.endpoint}openai'
   }
 }
 
@@ -328,6 +323,7 @@ resource embeddingsOp 'Microsoft.ApiManagement/service/apis/operations@2024-06-0
 }
 
 // APIM Policy:
+// - Sets backend service to use the defined backend resource
 // - Adds default api-version (required for Azure AI Search knowledge base integration)
 // - Uses managed identity to authenticate with Cognitive Services backend
 // - Rate limits to 100 calls per 60 seconds
@@ -336,7 +332,7 @@ resource policy 'Microsoft.ApiManagement/service/apis/policies@2024-06-01-previe
   name: 'policy'
   properties: {
     format: 'xml'
-    value: '<policies><inbound><base /><set-query-parameter name="api-version" exists-action="skip"><value>2024-10-21</value></set-query-parameter><authentication-managed-identity resource="https://cognitiveservices.azure.com" output-token-variable-name="msi-access-token" ignore-error="false" /><set-header name="Authorization" exists-action="override"><value>@("Bearer " + (string)context.Variables["msi-access-token"])</value></set-header><rate-limit calls="100" renewal-period="60" /></inbound><backend><base /></backend><outbound><base /></outbound></policies>'
+    value: '<policies><inbound><base /><set-backend-service backend-id="openai" /><set-query-parameter name="api-version" exists-action="skip"><value>2024-10-21</value></set-query-parameter><authentication-managed-identity resource="https://cognitiveservices.azure.com" output-token-variable-name="msi-access-token" ignore-error="false" /><set-header name="Authorization" exists-action="override"><value>@("Bearer " + (string)context.Variables["msi-access-token"])</value></set-header><rate-limit calls="100" renewal-period="60" /></inbound><backend><base /></backend><outbound><base /></outbound></policies>'
   }
 }
 

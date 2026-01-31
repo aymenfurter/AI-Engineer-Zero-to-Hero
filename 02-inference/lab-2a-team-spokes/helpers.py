@@ -2,7 +2,7 @@
 import subprocess, json, uuid, os, re
 from pathlib import Path
 
-def get_lz_account(rg="foundry-lz-parent"):
+def get_lz_account(rg="lab1a-foundry-lz-hub"):
     """Get Landing Zone account name"""
     result = subprocess.run(
         f'az cognitiveservices account list -g {rg} --query "[0].name" -o tsv',
@@ -29,7 +29,7 @@ def deploy_model(rg, account, model):
     )
     return result.returncode == 0, result.stderr[-200:] if result.stderr else ""
 
-def load_env(env_file='/workspaces/getting-started-with-foundry/.env'):
+def load_env(env_file=Path("../../.env")):
     """Load environment variables from .env file"""
     with open(env_file) as f:
         for line in f:
@@ -39,7 +39,7 @@ def load_env(env_file='/workspaces/getting-started-with-foundry/.env'):
                 os.environ[key] = value
     return os.environ.get('APIM_URL'), os.environ.get('APIM_KEY')
 
-def load_spoke_config(path='/workspaces/getting-started-with-foundry/02-inference/spoke-config.json'):
+def load_spoke_config(path=Path("../../02-inference/spoke-config.json")):
     """Load spoke configuration"""
     with open(path) as f:
         return json.load(f)
@@ -52,7 +52,7 @@ def get_principal_id():
 
 def deploy_spoke(spoke, principal_id, apim_url, apim_key, location="eastus2"):
     """Deploy a single team spoke"""
-    rg = spoke['resourceGroup']
+    rg = f"lab2a-{spoke['resourceGroup']}"
     subprocess.run(f'az group create -n {rg} -l {location} -o none', shell=True)
     
     conn_name = f"apim-{uuid.uuid4().hex[:8]}"
@@ -94,8 +94,8 @@ def deploy_spoke(spoke, principal_id, apim_url, apim_key, location="eastus2"):
         }
     return None
 
-def save_deployments(deployed_teams, outputs_file='/workspaces/getting-started-with-foundry/02-inference/team-deployments.json',
-                     env_file='/workspaces/getting-started-with-foundry/.env'):
+def save_deployments(deployed_teams, outputs_file=Path("../../02-inference/team-deployments.json"),
+                     env_file=Path("../../.env")):
     """Save deployment outputs to JSON and .env"""
     Path(outputs_file).write_text(json.dumps(deployed_teams, indent=2))
     
